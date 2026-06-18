@@ -1,0 +1,5 @@
+.env
+.DS_Store
+/vendor/
+.partie2
+.repomix-output
