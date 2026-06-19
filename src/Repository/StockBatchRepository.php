@@ -1,5 +1,4 @@
 <?php
-// src/Repository/StockBatchRepository.php
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/MouvementRepository.php';
 
@@ -11,21 +10,13 @@ class StockBatchRepository {
         $this->db = Database::getConnection();
         $this->mouvementRepo = new MouvementRepository();
     }
-    public function saveInputBatch(int $productId, string $lotNumber, int $quantity, string $expiryDate): bool {
-        try {
-            $this->db->beginTransaction();
-            $stmt = $this->db->prepare("
-                INSERT INTO lot_stocks (produit_id, numero_lot, quantite, date_peremption, statut)
-                VALUES (?, ?, ?, ?, 'OK')
-            ");
-            $stmt->execute([$productId, $lotNumber, $quantity, $expiryDate]);
-            $lotId = $this->db->lastInsertId();
-            $this->mouvementRepo->logMouvement((int)$lotId, 'ENTREE', $quantity);
-            $this->db->commit();
-            return true;
-        } catch (Exception $e) {
-            $this->db->rollBack();
-            return false;
-        }
+     public function getNextMonthAlerts(): array {
+        $sql = "SELECT l.*, p.nom as produit_nom
+                FROM lot_stocks l
+                JOIN produits p ON l.produit_id = p.id
+                WHERE l.date_peremption BETWEEN DATE_ADD(CURDATE(), INTERVAL 1 MONTH)
+                                             AND DATE_ADD(CURDATE(), INTERVAL 2 MONTH)
+                AND l.quantite > 0 AND l.statut != 'EXPIRED'";
+        return $this->db->query($sql)->fetchAll();
     }
 }
