@@ -17,7 +17,11 @@ class ApiStockController
         $this->batchRepo    = new StockBatchRepository();
     }
 
-
+    // =========================================================
+    // GET /api/v1/batches[?criteria=all|critical]
+    // Liste tous les lots du dashboard avec badge/couleur.
+    // Repository utilisé : StockBatchRepository->getDashboardLots()
+    // =========================================================
     public function listBatches(): void
     {
         AuthService::requireAnyRole(['pharmacien', 'preparateur', 'admin']);
@@ -34,6 +38,11 @@ class ApiStockController
         ]);
     }
 
+    // =========================================================
+    // GET /api/v1/products
+    // Liste tous les produits pour les <select>.
+    // Repository utilisé : ProductRepository->getAllProducts()
+    // =========================================================
     public function listProducts(): void
     {
         AuthService::requireAnyRole(['pharmacien', 'preparateur', 'admin']);
@@ -47,7 +56,11 @@ class ApiStockController
         ]);
     }
 
-
+    // =========================================================
+    // POST /api/v1/batches
+    // Crée un nouveau lot dans la file FEFO.
+    // Repository utilisé : StockBatchRepository->saveInputBatch()
+    // =========================================================
     public function createBatch(): void
     {
         AuthService::requireAnyRole(['preparateur', 'admin']);
@@ -83,7 +96,12 @@ class ApiStockController
         }
     }
 
-
+    // =========================================================
+    // POST /api/v1/batches/checkout
+    // Déstockage FEFO par produit_id (dashboard — bouton "Délivrer").
+    // Repository utilisé : StockBatchRepository->getFefoBatchForProduct()
+    //                    + StockBatchRepository->dispenseBatch()
+    // =========================================================
     public function checkout(): void
     {
         AuthService::requireAnyRole(['pharmacien', 'preparateur', 'admin']);
@@ -117,6 +135,11 @@ class ApiStockController
         }
     }
 
+    // =========================================================
+    // POST /api/v1/batches/checkout/direct
+    // Déstockage direct par lot_id (page Sortie Intelligente).
+    // Repository utilisé : StockBatchRepository->dispenseBatch()
+    // =========================================================
     public function checkoutDirect(): void
     {
         AuthService::requireAnyRole(['pharmacien', 'preparateur', 'admin']);
@@ -151,7 +174,11 @@ class ApiStockController
         }
     }
 
- 
+    // =========================================================
+    // PATCH /api/v1/batches/{id}/expire
+    // Marque un lot comme EXPIRED, quantité → 0.
+    // Repository utilisé : StockBatchRepository->markBatchAsExpired()
+    // =========================================================
     public function markExpired(int $id): void
     {
         AuthService::requireAnyRole(['pharmacien', 'admin']);
@@ -186,7 +213,11 @@ class ApiStockController
         }
     }
 
-
+    // =========================================================
+    // GET /api/v1/batches/fefo?produit_id=X
+    // Retourne le lot FEFO prioritaire pour un produit donné.
+    // Repository utilisé : StockBatchRepository->getFefoBatchForProduct()
+    // =========================================================
     public function getFefoBatch(): void
     {
         AuthService::requireAnyRole(['pharmacien', 'preparateur', 'admin']);

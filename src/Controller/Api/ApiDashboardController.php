@@ -14,7 +14,10 @@ class ApiDashboardController
         $this->stockService = new StockService();
     }
 
- 
+    /**
+     * GET /api/v1/dashboard/alerts
+     * Retourne le nombre de lots expirant le mois prochain.
+     */
     public function getAlerts(): void
     {
         AuthService::requireAnyRole(['pharmacien', 'preparateur', 'admin']);
