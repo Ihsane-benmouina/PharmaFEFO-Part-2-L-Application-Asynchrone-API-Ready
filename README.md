@@ -16,8 +16,7 @@ L'application permet de :
 - Voir un rapport financier des pertes (produits périmés)
 
 ---
-## lien de deploiyment
-pharmafefo-application-asynchrone-production.up.railway.app
+
 ## ⚙️ Comment ça fonctionne (en simple)
 
 Le projet est découpé en deux parties qui communiquent ensemble :
@@ -161,5 +160,7 @@ Toutes les routes API commencent par `?action=api/v1/...` et renvoient du JSON.
   4. Appeler cette route depuis le JavaScript
 
 ---
+## lien de deploiyment
+pharmafefo-application-asynchrone-production.up.railway.app
 
 *Projet réalisé dans le cadre d'un exercice d'architecture MVC + API REST en PHP.*
