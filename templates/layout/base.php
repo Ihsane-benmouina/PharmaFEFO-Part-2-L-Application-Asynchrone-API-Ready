@@ -12,22 +12,13 @@
                 extend: {
                     colors: {
                         medical: {
-                            50: '#f0fdf4',
-                            100: '#dcfce7',
-                            200: '#bbf7d0',
-                            300: '#86efac',
-                            400: '#4ade80',
-                            500: '#10b981',
-                            600: '#059669',
-                            700: '#047857',
-                            800: '#065f46',
-                            900: '#064e3b',
-                            950: '#022c22',
+                            50: '#f0fdf4', 100: '#dcfce7', 200: '#bbf7d0',
+                            300: '#86efac', 400: '#4ade80', 500: '#10b981',
+                            600: '#059669', 700: '#047857', 800: '#065f46',
+                            900: '#064e3b', 950: '#022c22',
                         }
                     },
-                    fontFamily: {
-                        sans: ['Inter', 'system-ui', 'sans-serif'],
-                    }
+                    fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] }
                 }
             }
         }
@@ -40,25 +31,21 @@
         ::-webkit-scrollbar-track { background: #f1f5f9; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #059669; }
-
         .sidebar-link { position: relative; }
         .sidebar-link::before {
-            content: '';
-            position: absolute;
-            left: 0; top: 50%;
-            transform: translateY(-50%);
-            width: 4px; height: 0;
-            background: #ffffff;
-            border-radius: 0 4px 4px 0;
+            content: ''; position: absolute; left: 0; top: 50%;
+            transform: translateY(-50%); width: 4px; height: 0;
+            background: #ffffff; border-radius: 0 4px 4px 0;
             transition: height 0.25s cubic-bezier(0.4,0,0.2,1);
         }
         .sidebar-link:hover::before { height: 50%; }
-
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(6px); }
             to   { opacity: 1; transform: translateY(0); }
         }
         .main-content { animation: fadeIn 0.35s cubic-bezier(0.4,0,0.2,1); }
+        /* Masquage conditionnel géré par JS selon le rôle */
+        [data-role-required] { display: none; }
     </style>
 </head>
 
@@ -73,6 +60,7 @@
 
         <div class="flex flex-col flex-1 overflow-y-auto">
 
+            <!-- Logo -->
             <div class="p-6 border-b border-emerald-500/40 flex items-center gap-3 bg-white/10">
                 <div class="w-10 h-10 rounded-xl bg-white border border-emerald-200 text-emerald-600 flex items-center justify-center shadow-md">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5">
@@ -85,20 +73,16 @@
                 </div>
             </div>
 
-            <?php if (isset($_SESSION['user_nom'])): ?>
-                <div class="m-4 p-4 rounded-xl bg-white/10 border border-white/20 flex items-center gap-3 backdrop-blur-md">
-                    <div class="w-9 h-9 rounded-lg bg-white text-emerald-700 font-bold text-xs flex items-center justify-center uppercase shadow-sm">
-                        <?= mb_substr($_SESSION['user_nom'], 0, 2) ?>
-                    </div>
-                    <div class="overflow-hidden flex-1 min-w-0">
-                        <p class="font-semibold text-xs text-white truncate"><?= htmlspecialchars($_SESSION['user_nom']) ?></p>
-                        <span class="text-[9px] px-2 py-0.5 rounded font-mono bg-white/20 text-white border border-white/30 uppercase tracking-wider inline-block mt-1 font-bold">
-                            <?= htmlspecialchars($_SESSION['user_role']) ?>
-                        </span>
-                    </div>
+            <!-- Profil utilisateur — rempli par JS via /api/v1/me -->
+            <div id="sidebar-user-block" class="m-4 p-4 rounded-xl bg-white/10 border border-white/20 flex items-center gap-3 backdrop-blur-md hidden">
+                <div id="sidebar-user-avatar" class="w-9 h-9 rounded-lg bg-white text-emerald-700 font-bold text-xs flex items-center justify-center uppercase shadow-sm"></div>
+                <div class="overflow-hidden flex-1 min-w-0">
+                    <p id="sidebar-user-name" class="font-semibold text-xs text-white truncate"></p>
+                    <span id="sidebar-user-role" class="text-[9px] px-2 py-0.5 rounded font-mono bg-white/20 text-white border border-white/30 uppercase tracking-wider inline-block mt-1 font-bold"></span>
                 </div>
-            <?php endif; ?>
+            </div>
 
+            <!-- Navigation -->
             <nav class="px-3 py-2 space-y-1 flex-1">
                 <span class="px-4 text-[10px] font-bold uppercase tracking-wider text-emerald-200 block mb-3 mt-2">Navigation Principale</span>
 
@@ -111,7 +95,8 @@
                     Tableau de Bord
                 </a>
 
-                <?php if (isset($_SESSION['user_role']) && in_array($_SESSION['user_role'], ['preparateur', 'pharmacien', 'admin'])): ?>
+                <!-- Liens visibles pour preparateur / pharmacien / admin — masqués par défaut, affichés par JS -->
+                <div id="nav-stock-links" class="space-y-1">
                     <a href="index.php?action=add-batch" class="sidebar-link flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold transition-all duration-200 hover:bg-white/15 text-emerald-100 hover:text-white group">
                         <span class="w-8 h-8 rounded-lg bg-white/10 border border-white/10 group-hover:bg-white/20 flex items-center justify-center transition-all duration-200">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 text-white">
@@ -128,14 +113,15 @@
                         </span>
                         Sortie Intelligente
                     </a>
-                <?php endif; ?>
+                </div>
 
-                <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin'): ?>
+                <!-- Section Admin — masquée par défaut, affichée par JS si rôle=admin -->
+                <div id="nav-admin-links" class="hidden">
                     <span class="px-4 pt-5 text-[10px] font-bold uppercase tracking-wider text-emerald-100 block mb-3">Privilèges Admin</span>
                     <a href="index.php?action=users" class="sidebar-link flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold transition-all duration-200 hover:bg-white/15 text-emerald-50 hover:text-white group">
                         <span class="w-8 h-8 rounded-lg bg-white/10 border border-white/10 group-hover:bg-white/20 flex items-center justify-center transition-all duration-200">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 text-purple-200">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.75 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
                             </svg>
                         </span>
                         Gestion Équipe
@@ -148,10 +134,11 @@
                         </span>
                         Rapport Financier
                     </a>
-                <?php endif; ?>
+                </div>
             </nav>
         </div>
 
+        <!-- Déconnexion -->
         <div class="p-4 border-t border-white/10 bg-white/5 backdrop-blur-sm">
             <a href="index.php?action=logout"
                class="flex items-center justify-center gap-2 w-full px-4 py-2 rounded-xl bg-white/10 hover:bg-rose-600 text-white text-xs font-semibold uppercase tracking-wider transition-all duration-200 border border-white/10 shadow-sm">
@@ -184,20 +171,19 @@
                 </div>
             </div>
             <div class="flex items-center gap-3">
-                <div class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-50 border border-emerald-100/60">
+                <!-- Date injectée par JS -->
+                <div id="header-date-full" class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-50 border border-emerald-100/60">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-3.5 h-3.5 text-emerald-600">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
                     </svg>
-                    <span class="text-xs text-emerald-800 font-semibold font-mono"><?= date('d M Y') ?></span>
+                    <span id="header-date-text" class="text-xs text-emerald-800 font-semibold font-mono"></span>
                 </div>
-                <div class="sm:hidden text-xs text-slate-500 font-bold font-mono bg-slate-100 px-2.5 py-1 rounded">
-                    <?= date('d/m/Y') ?>
-                </div>
+                <div id="header-date-short" class="sm:hidden text-xs text-slate-500 font-bold font-mono bg-slate-100 px-2.5 py-1 rounded"></div>
             </div>
         </header>
 
         <main class="p-4 sm:p-6 lg:p-8 flex-grow max-w-[1400px] w-full mx-auto main-content">
-            <?= $content ?? '<div class="flex flex-col items-center justify-center py-24 text-slate-400 bg-white rounded-2xl border border-slate-100 shadow-xs"><p class="text-sm font-medium text-slate-400">Aucun contenu disponible.</p></div>' ?>
+            <?= $content ?? '' ?>
         </main>
 
         <footer class="px-4 sm:px-8 py-5 bg-white border-t border-slate-200/60 mt-auto">
@@ -207,9 +193,7 @@
                     <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200/50 text-[10px] font-bold uppercase tracking-wider">
                         <span class="w-1 h-1 rounded-full bg-emerald-500"></span> FEFO
                     </span>
-                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-50 text-slate-500 border border-slate-200 text-[10px] font-mono font-bold">
-                        v2026
-                    </span>
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-50 text-slate-500 border border-slate-200 text-[10px] font-mono font-bold">v2026</span>
                 </div>
             </div>
         </footer>
@@ -217,16 +201,11 @@
 
     <script>
         function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('sidebar-overlay');
-            sidebar.classList.toggle('-translate-x-full');
-            overlay.classList.toggle('hidden');
+            document.getElementById('sidebar').classList.toggle('-translate-x-full');
+            document.getElementById('sidebar-overlay').classList.toggle('hidden');
         }
     </script>
-
-    <!-- Scripts JS Partie 2 — chargés après le DOM -->
     <script src="js/app.js"></script>
     <script src="js/dashboard.js"></script>
-
 </body>
 </html>

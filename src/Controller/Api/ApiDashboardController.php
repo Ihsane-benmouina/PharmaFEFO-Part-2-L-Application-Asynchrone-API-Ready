@@ -14,7 +14,7 @@ class ApiDashboardController
         $this->stockService = new StockService();
     }
 
-  
+ 
     public function getAlerts(): void
     {
         AuthService::requireAnyRole(['pharmacien', 'preparateur', 'admin']);
