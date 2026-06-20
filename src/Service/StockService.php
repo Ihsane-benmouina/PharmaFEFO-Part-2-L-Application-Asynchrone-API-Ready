@@ -15,12 +15,7 @@ class StockService
         $this->productRepo = new ProductRepository();
     }
 
-    /**
-     * Prépare les lots du dashboard avec badge et couleur calculés côté PHP.
-     * Utilisé par le Web/DashboardController ET par l'API (GET /api/v1/batches).
-     *
-     * @param string|null $filter  null|'ROUGE'|'critical'
-     */
+ 
     public function processBatchesForDashboard(?string $filter = null): array
     {
         // CORRECTION : mapper le filtre JS 'critical' vers le filtre SQL 'ROUGE'
@@ -64,10 +59,7 @@ class StockService
         return $processedLots;
     }
 
-    /**
-     * Sérialise les lots pour la réponse JSON de l'API.
-     * Les clés sont en camelCase pour correspondre au JS existant.
-     */
+   
     public function processBatchesForApi(?string $filter = null): array
     {
         $lots   = $this->processBatchesForDashboard($filter);
@@ -101,9 +93,7 @@ class StockService
         return $this->productRepo->getAllProducts();
     }
 
-    /**
-     * CORRECTION BUG CRITIQUE : 'Y-m-getFefoBatchForProductH:i:s' → 'Y-m-d'
-     */
+ 
     public function createBatch(int $productId, string $lotNumber, int $quantity, string $expiryDate): bool
     {
         $today     = new DateTime((new DateTime())->format('Y-m-d')); // BUG CORRIGÉ
